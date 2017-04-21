@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import shlex
 import ntpath
@@ -19,7 +20,18 @@ class CodeceptionTestCommand(sublime_plugin.WindowCommand):
 
         active_view = self.window.active_view()
 
-        return file_name, codeception_config_path, active_view, directory
+        if re.search('/acceptance', directory):
+            suite = 'acceptance'
+        elif re.search('/integration', directory):
+            suite = 'integration'
+        elif re.search('/functional', directory):
+            suite = 'functional'
+        elif re.search('/unit', directory):
+            suite = 'unit'
+        elif re.search('/api', directory):
+            suite = 'api'
+
+        return file_name, codeception_config_path, active_view, directory, suite
 
     def get_current_function(self, view):
         sel = view.sel()[0]
@@ -78,33 +90,33 @@ class CodeceptionTestCommand(sublime_plugin.WindowCommand):
 class RunCodeceptionTestCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, codeception_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory, suite = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + file_name)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + suite + ' ' + file_name)
 
 class RunAllCodeceptionTestsCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, codeception_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory, suite = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ')
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + suite + ' ')
 
 
 class RunSingleCodeceptionTestCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, codeception_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory, suite = self.get_paths()
 
         current_function = self.get_current_function(active_view)
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + file_name + ":^" + current_function + "$")
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + suite + ' ' + file_name + ":^" + current_function + "$")
 
 class RunCodeceptionTestsInDirCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, codeception_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory, suite = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + directory)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + suite + ' ' + directory)
 
 class FindMatchingTestCommand(sublime_plugin.WindowCommand):
 
