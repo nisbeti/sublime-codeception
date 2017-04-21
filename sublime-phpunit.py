@@ -7,19 +7,19 @@ import sublime
 import sublime_plugin
 from time import sleep
 
-class PhpunitTestCommand(sublime_plugin.WindowCommand):
+class CodeceptionTestCommand(sublime_plugin.WindowCommand):
     def get_paths(self):
         file_name = self.window.active_view().file_name()
-        phpunit_config_path = self.find_phpunit_config(file_name)
+        codeception_config_path = self.find_codeception_config(file_name)
 
         directory = os.path.dirname(os.path.realpath(file_name))
 
         file_name = file_name.replace(' ', '\ ')
-        phpunit_config_path = phpunit_config_path.replace(' ', '\ ')
+        codeception_config_path = codeception_config_path.replace(' ', '\ ')
 
         active_view = self.window.active_view()
 
-        return file_name, phpunit_config_path, active_view, directory
+        return file_name, codeception_config_path, active_view, directory
 
     def get_current_function(self, view):
         sel = view.sel()[0]
@@ -31,20 +31,20 @@ class PhpunitTestCommand(sublime_plugin.WindowCommand):
                 break
         return cf
 
-    def find_phpunit_config(self, file_name):
-        phpunit_config_path = file_name
+    def find_codeception_config(self, file_name):
+        codeception_config_path = file_name
         found = False
         while found == False:
-            phpunit_config_path = os.path.abspath(os.path.join(phpunit_config_path, os.pardir))
-            found = os.path.isfile(phpunit_config_path + '/phpunit.xml') or phpunit_config_path == '/'
-        return phpunit_config_path
+            codeception_config_path = os.path.abspath(os.path.join(codeception_config_path, os.pardir))
+            found = os.path.isfile(codeception_config_path + '/phpunit.xml') or codeception_config_path == '/'
+        return codeception_config_path
 
     def run_in_terminal(self, command):
         settings = sublime.load_settings("Preferences.sublime-settings")
-        terminal_setting = settings.get('phpunit-sublime-terminal', 'Terminal')
+        terminal_setting = settings.get('codeception-sublime-terminal', 'Terminal')
 
-        autofocus = settings.get('phpunit-sublime-autofocus', False)
-        autofocus_delay = settings.get('phpunit-sublime-autofocus-delay', 250)
+        autofocus = settings.get('codeception-sublime-autofocus', False)
+        autofocus_delay = settings.get('codeception-sublime-autofocus-delay', 250)
 
         osascript_command = 'osascript '
 
@@ -75,36 +75,36 @@ class PhpunitTestCommand(sublime_plugin.WindowCommand):
     def path_to(self, file):
         return '"' + os.path.dirname(os.path.realpath(__file__)) + '/' + file + '"'
 
-class RunPhpunitTestCommand(PhpunitTestCommand):
+class RunCodeceptionTestCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, phpunit_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory = self.get_paths()
 
-        self.run_in_terminal('cd ' + phpunit_config_path + ' && phpunit ' + file_name)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + file_name)
 
-class RunAllPhpunitTestsCommand(PhpunitTestCommand):
-
-    def run(self, *args, **kwargs):
-        file_name, phpunit_config_path, active_view, directory = self.get_paths()
-
-        self.run_in_terminal('cd ' + phpunit_config_path + ' && phpunit')
-
-
-class RunSinglePhpunitTestCommand(PhpunitTestCommand):
+class RunAllCodeceptionTestsCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, phpunit_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory = self.get_paths()
+
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ')
+
+
+class RunSingleCodeceptionTestCommand(CodeceptionTestCommand):
+
+    def run(self, *args, **kwargs):
+        file_name, codeception_config_path, active_view, directory = self.get_paths()
 
         current_function = self.get_current_function(active_view)
 
-        self.run_in_terminal('cd ' + phpunit_config_path + ' && phpunit ' + file_name + " --filter '/::" + current_function + "$/'")
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + file_name + ":^" + current_function + "$")
 
-class RunPhpunitTestsInDirCommand(PhpunitTestCommand):
+class RunCodeceptionTestsInDirCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
-        file_name, phpunit_config_path, active_view, directory = self.get_paths()
+        file_name, codeception_config_path, active_view, directory = self.get_paths()
 
-        self.run_in_terminal('cd ' + phpunit_config_path + ' && phpunit ' + directory)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + directory)
 
 class FindMatchingTestCommand(sublime_plugin.WindowCommand):
 
