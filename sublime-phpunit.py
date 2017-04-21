@@ -80,14 +80,14 @@ class RunCodeceptionTestCommand(CodeceptionTestCommand):
     def run(self, *args, **kwargs):
         file_name, codeception_config_path, active_view, directory = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + file_name)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + file_name)
 
 class RunAllCodeceptionTestsCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
         file_name, codeception_config_path, active_view, directory = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ')
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ')
 
 
 class RunSingleCodeceptionTestCommand(CodeceptionTestCommand):
@@ -97,14 +97,14 @@ class RunSingleCodeceptionTestCommand(CodeceptionTestCommand):
 
         current_function = self.get_current_function(active_view)
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + file_name + ":^" + current_function + "$")
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + file_name + ":^" + current_function + "$")
 
 class RunCodeceptionTestsInDirCommand(CodeceptionTestCommand):
 
     def run(self, *args, **kwargs):
         file_name, codeception_config_path, active_view, directory = self.get_paths()
 
-        self.run_in_terminal('cd ' + codeception_config_path + ' && codeception run ' + directory)
+        self.run_in_terminal('cd ' + codeception_config_path + ' && codecept run ' + directory)
 
 class FindMatchingTestCommand(sublime_plugin.WindowCommand):
 
