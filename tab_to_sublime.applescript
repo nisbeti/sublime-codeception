@@ -5,6 +5,7 @@
 -- started running and the time that this script ran
 
 on tabToSublime()
+    delay 3.5
 	tell application "System Events" to keystroke tab using {command down}
 end tabToSublime
 
